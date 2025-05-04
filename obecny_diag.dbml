@@ -1,208 +1,233 @@
+
 // Docs: https://dbml.dbdiagram.io/docs
-Table role {
-  id integer [primary key]
-  role_name varchar(30)
+// -----------------------------
+// ROLES & PERMISSIONS
+// -----------------------------
+table role {
+  id                    integer [primary key]
+  role_name             varchar(30)
 }
 
-table privilage {
-  id integer [primary key]
-  pr_name varchar(30)
+table privilege {
+  id                    integer [primary key]
+  pr_name               varchar(30)
 }
 
 table manage_role {
-  id integer [primary key]
-  role_id integer [Ref:  > role.id]
-  pr_id integer   [Ref:  > privilage.id]
-  status bool
+  id                    integer [primary key]
+  role_id               integer [Ref:  > role.id]
+  pr_id                 integer   [Ref:  > privilege.id]
+  status                bool
 }
 
 table manage_role_history {
-  id integer [primary key]
-  manage_id integer [Ref:  > manage_role.id]
-  who_changed char(12) [Ref:  > user.id]
-  change_id integer [Ref:  > change_describe.id]
-  change_time datetime
+  id                   integer [primary key]
+  manage_id            integer [Ref:  > manage_role.id]
+  who_changed          char(12) [Ref:  > user.id]
+  change_id            integer [Ref:  > change_describe.id]
+  change_time          datetime
 }
 
 // opisuje zmiane np logowane, wylogowanie, update tabela itp
 table change_describe {
-  id integer [primary key]
-  nazwa varchar(30)
+  id                  integer [primary key]
+  nazwa               varchar(30)
 }
 
+// -----------------------------
+// USERS
+// -----------------------------
 table user {
-  id char(12) [primary key]
-  imie varchar(50)
-  nazwisko varchar(50)
-  email varchar(100)
-  role_id integer [Ref:  > role.id]
-  pass_id integer [unique, Ref: < password.id]
-  status bool
-  created_at datetime
+  id                  char(12) [primary key]
+  imie                varchar(50)
+  nazwisko            varchar(50)
+  email               varchar(100)
+  role_id             integer [Ref:  > role.id]
+  pass_id             integer [unique, Ref: < password.id]
+  status              bool
+  created_at          datetime
 }
 
 table password {
-  id integer [primary key]
-  pass vatchar(20)
+  id                 integer [primary key]
+  pass               varchar(20)
 }
 
 table user_change_history {
-  id integer [primary key]
-  who_changed char(12) [Ref:  > user.id]
-  user_changed_id char(12) [Ref:  > user.id]
-  change integer [Ref:  > change_describe.id]
-  change_time datetime
+  id                 integer [primary key]
+  who_changed        char(12) [Ref:  > user.id]
+  user_changed_id    char(12) [Ref:  > user.id]
+  change             integer [Ref:  > change_describe.id]
+  change_time        datetime
 }
 
 table user_log_history {
-  id integer [primary key]
-  who_log char(12) [Ref:  > user.id]
-  log_time datetime
-  change intger [Ref:  > change_describe.id]
+  id                integer [primary key]
+  who_log           char(12) [Ref:  > user.id]
+  log_time          datetime
+  change            integer [Ref:  > change_describe.id]
 }
 
+// -----------------------------
+// BACKUP
+// -----------------------------
 table backup_schedule {
-  id integer [primary key]
-  repeat integer
-  backup_date datetime
-  user_id char(12) [Ref: > user.id]
+  id               integer   [primary key]
+  repeat           integer
+  backup_date      datetime
+  user_id          char(12)  [Ref: > user.id]
+  integration_id   integer   [Ref:  > api_integration.id] // NOWE
 }
 
 table backup_files_info {
-  id integer [primary key]
-  file_name varchar(30) [not null]
-  patch varchar(200) [not null]
-  schedule_id integer
-  created_date datetime
-  user_id char(12) [Ref:  > user.id]
+  id                integer [primary key]
+  file_name         varchar(30) [not null]
+  patch             varchar(200) [not null]
+  schedule_id       integer
+  created_date      datetime
+  user_id           char(12) [Ref:  > user.id]
 }
-
+// -----------------------------
+// CUSTOMERS & LOCATION
+// -----------------------------
 table customer {
-  id integer [primary key]
-  imie varchar(30)
-  nazwisko varchar(30)
-  email varchar(100)
-  telefon varchar(20)
-  ulica varchar(50)
-  nr_budynku varchar(10)
-  nr_lokalu varchar(10)
-  kod_pocztowy varchar(10)
-  miasto_id integer [Ref:  > miasto.id]
-  wojewodztwo varchar(50)
-  kraj_id integer [Ref:  > panstwo.id]
-  NIP varchar(20)
-  REGON varchar(20)
-  PKWIU varchar(20)
-  reprezentant varchar(100)
-  status bool
-  created_at datetime
-  is_deleted bool
+  id               integer [primary key]
+  imie             varchar(30)
+  nazwisko         varchar(30)
+  email            varchar(100)
+  telefon          varchar(20)
+  ulica            varchar(50)
+  nr_budynku       varchar(10)
+  nr_lokalu        varchar(10)
+  kod_pocztowy     varchar(10)
+  miasto_id        integer [Ref:  > city.id]
+  wojewodztwo      varchar(50)
+  kraj_id          integer [Ref:  > country.id]
+  NIP              varchar(20)
+  REGON            varchar(20)
+  PKWIU            varchar(20)
+  reprezentant     varchar(100)
+  status           bool
+  created_at       datetime
+  is_deleted       bool
 }
 
-table miasto{
-  id integer [primary key]
-  nazwa varchar(50)
+table city {
+  id              integer [primary key]
+  nazwa           varchar(50)
 }
 
-table panstwo{
-  id integer [primary key]
-  nazwa varchar(50)
+table country {
+  id              integer [primary key]
+  nazwa           varchar(50)
 }
 
 table customer_change_history {
-  id integer [primary key]
-  who_changed char(12) [Ref:  > user.id]
-  customer_id char(12) [Ref:  > customer.id]
-  change integer [Ref:  > change_describe.id]
-  change_time datetime
+  id              integer [primary key]
+  who_changed     char(12) [Ref:  > user.id]
+  customer_id     integer [Ref:  > customer.id]
+  change          integer [Ref:  > change_describe.id]
+  change_time     datetime
 }
 
+// -----------------------------
+// CAMPAIGNS & CONTACT
+// -----------------------------
 // np telefon, sms, e-mail
-table contact_form {
-  id integer [primary key]
-  nazwa varchar(20)
+Table contact_form {        // wskazuje domyslne API dla danego kanalu
+  id               integer   [primary key]
+  nazwa            varchar(20)
+  integration_id   integer   [Ref:  > api_integration.id] // NOWE
 }
 
-table campain {
-  id integer [primary key]
-  start_date datetime
-  end_date datetime
-  name varchar(30)
-  opis varchar(300)
-  contact_id integer [Ref:  > contact_form.id]
-  status bool
+table campaign {
+  id               integer   [primary key]
+  start_date       datetime
+  end_date         datetime
+  name             varchar(30)
+  opis             varchar(300)
+  contact_id       integer   [Ref:  > contact_form.id]
+  integration_id   integer   [Ref:  > api_integration.id] // NOWE
+  status           bool
 }
 
-table campain_handle{
-  id integer [primary key]
-  campain_id integer [Ref:  > campain.id]
-  customer_id integer [Ref:  > customer.id]
-  status bool //kontakt byl badz nie
+table campaign_handle {
+  id              integer [primary key]
+  campaign_id     integer [Ref:  > campaign.id]
+  customer_id     integer [Ref:  > customer.id]
+  status          bool //kontakt byl badz nie
 }
 
+// -----------------------------
+// TICKETS (module 8 – CRM)
+// -----------------------------
 table problem_kategory {
-  id integer [primary key]
-  nazwa varchar(50)
+  id            integer [primary key]
+  nazwa         varchar(50)
 }
 
-table reported_problem {
-  id integer [primary key]
-  customer_id integer [Ref:  > customer.id]
-  user_id integer [Ref:  > user.id]
-  kategory_id integer [Ref:  > problem_kategory.id]
-  contact_id integer [Ref:  > contact_form.id]
-  opis varchar(300)
+table ticket {
+  id            integer [primary key]
+  customer_id   integer [Ref:  > customer.id]
+  user_id       integer [Ref:  > user.id]
+  category_id   integer [Ref:  > problem_kategory.id]
+  contact_id    integer [Ref:  > contact_form.id]
+  opis          varchar(300)
   data_zgloszenia datetime
   data_zakonczenia datetime
 }
 
-table handle_problem_history {
-  id integer [primary key]
-  data_handle datetime [Ref:  > reported_problem.id]
-  handle_describe varchar(300)
+table ticket_history {
+  id            integer [primary key]
+  ticket_id     integer   [Ref:  > ticket.id]
+  data_obslugi  datetime [Ref:  > ticket.id]
+  opis_obslugi  varchar(300)
 }
 
+// -----------------------------
+// CONTRACTS
+// -----------------------------
 table contracts {
-  id integer [primary key]
+  id            integer [primary key]
   contract_number varchar(100)
-  created_at datetime
-  is_deleted bool
-  signed_at dateime
-  updated_at datetime
+  created_at    datetime
+  is_deleted    bool
+  signed_at     datetime
+  updated_at    datetime
   contract_type integer [Ref: > contract_type.id]
-  description varchar(400)
+  description   varchar(400)
   contract_from datetime
-  contract_to datetime
-  supplier integer
-  customer_id integer
+  contract_to   datetime
+  supplier      integer
+  customer_id   integer
   positive_verification_date datetime
 
 }
 
-Table contract_type {
-  id integer [primary key]
-  name varchar(150)
+table contract_type {
+  id          integer [primary key]
+  name        varchar(150)
 }
 
 Table energy_supplier {
-  id integer [primary key]
-  name varchar(150)
+  id          integer [primary key]
+  name        varchar(150)
 }
 
-Table contract_status_timelines{
-  id integer [primary key]
-  created_at datetime 
-  status varchar(150)
+Table contract_status_timelines {
+  id          integer [primary key]
+  created_at  datetime 
+  status      varchar(150)
   contract_id integer [Ref : > contracts.id]
-  user_id integer [Ref : > user.id]
+  user_id     integer [Ref : > user.id]
 }
 
-Table customers_reservations{
-  id integer [primary key]
-  is_active bool
+table customers_reservations{
+  id          integer [primary key]
+  is_active   bool
   reserved_at datetime
   customer_id integer [Ref : > customer.id]
-  user_id integer [Ref : > user.id]
+  user_id     integer [Ref : > user.id]
 }
 
 
@@ -212,7 +237,7 @@ Ref: "energy_supplier"."id" < "contracts"."supplier"
 Ref: "contracts"."customer_id" < "customer"."id"
 
 // -----------------------------
-// TAGOWANIE
+// TAGGING
 // -----------------------------
 table tag {
   id               integer      [primary key]
@@ -223,15 +248,15 @@ table tag {
 
 table tag_assignment {
   id               integer      [primary key]
-  id_taga          integer      [Ref:  > tag.id]
-  id_encji         integer
-  typ_encji        varchar(30)  // np. 'customer', 'contracts', 'reported_problem'
+  tag_id           integer      [Ref:  > tag.id]
+  entity_id        integer
+  entity_type      varchar(30)  // np. 'customer', 'contracts', 'reported_problem'
   data_przypisania datetime
-  id_uzytkownika   char(12)     [Ref:  > user.id]
+  user_id          char(12)     [Ref:  > user.id]
 }
 
 // -----------------------------
-// DOKUMENTY I WERSJONOWANIE
+// DOCUMENTS
 // -----------------------------
 table document {
   id                    integer      [primary key]
@@ -240,21 +265,21 @@ table document {
   id_encji_wlasciciela  integer
   typ_encji_wlasciciela varchar(30)  // 'customer', 'contracts', itp.
   czy_najnowsza         bool
-  id_uzytkownika        char(12)     [Ref:  > user.id]
+  user_id               char(12)     [Ref:  > user.id]
   data_utworzenia       datetime
 }
 
 table document_version {
   id              integer      [primary key]
-  id_dokumentu    integer      [Ref:  > document.id]
+  document_id     integer      [Ref:  > document.id]
   numer_wersji    integer
   sciezka_plik    varchar(200)
-  id_uzytkownika  char(12)     [Ref:  > user.id]
+  user_id         char(12)     [Ref:  > user.id]
   data_utworzenia datetime
 }
 
 // -----------------------------
-// DASHBOARDY I WIDZETY
+// DASHBOARDS & WIDGETS
 // -----------------------------
 table dashboard {
   id              integer      [primary key]
@@ -266,7 +291,7 @@ table dashboard {
 
 table widget {
   id            integer      [primary key]
-  id_dashboardu integer      [Ref:  > dashboard.id]
+  dashboard_id  integer      [Ref:  > dashboard.id]
   typ           varchar(50)  // 'kalendarz', 'KPI', 'chart', itp.
   konfiguracja  text
   pozycja_x     integer
@@ -274,7 +299,7 @@ table widget {
 }
 
 // -----------------------------
-// RAPORTY I EKSPORTY
+// REPORTING
 // -----------------------------
 table report {
   id              integer      [primary key]
@@ -282,35 +307,36 @@ table report {
   typ_raportu     varchar(50)  // 'sprzedaz', 'marketing', 'obsluga'
   definicja       text         // JSON lub SQL
   data_utworzenia datetime
-  id_uzytkownika  char(12)     [Ref:  > user.id]
+  user_id         char(12)     [Ref:  > user.id]
 }
 
 table report_export {
-  id                 integer      [primary key]
-  id_raportu         integer      [Ref:  > report.id]
-  format             varchar(10)  // XLSX, PDF, JPG
+  id                 integer   [primary key]
+  report_id          integer   [Ref:  > report.id]
+  format             varchar(10) // XLSX, PDF, JPG
   sciezka_plik       varchar(200)
+  integration_id     integer   [Ref:  > api_integration.id] // NOWE
   data_wygenerowania datetime
-  id_uzytkownika     char(12)     [Ref:  > user.id]
+  user_id            char(12)  [Ref:  > user.id]
 }
 
 // -----------------------------
-// CENTRUM WIEDZY / FAQ
+// KNOWLEDGE BASE 
 // -----------------------------
 table knowledge_article {
   id                integer      [primary key]
   tytul             varchar(150)
   tresc             text
   format            varchar(20)  // 'markdown', 'html', 'pdf'
-  id_autora         char(12)     [Ref:  > user.id]
+  user_id           char(12)     [Ref:  > user.id]
   data_aktualizacji datetime
 }
 
-// -----------------------------
-// INTEGRACJE API
-// -----------------------------
-table api_integration {
-  id                 integer      [primary key]
+// ======================
+// API INTEGRATIONS – CORE
+// ======================
+Table api_integration {
+  id                 integer   [primary key]
   nazwa              varchar(100)
   typ                varchar(50)   // 'ksiegowe', 'e-mail', 'CEIDG'
   endpoint           varchar(200)
@@ -319,12 +345,36 @@ table api_integration {
   status             bool
 }
 
+// Dane uwierzytelniajace lub klucze API (prywatne per uzytkownik lub globalne)
+Table integration_credential {
+  id              integer   [primary key]
+  integration_id  integer   [Ref:  > api_integration.id]
+  user_id         char(12)  [Ref:  > user.id]  // null = global credential
+  credentials     text      // JSON: token, login, refresh_token...
+  created_at      datetime
+}
+
+// Uniwersalny log kazdego wywolania API z systemu
+Table integration_event {
+  id              integer   [primary key]
+  integration_id  integer   [Ref:  > api_integration.id]
+  user_id         char(12)  [Ref:  > user.id]
+  entity_type     varchar(30) // 'report_export', 'campaign', 'backup'
+  entity_id       integer
+  action          varchar(50) // 'POST /invoice', 'GET /contract'
+  status_code     integer
+  message         text        // tresc bledow lub skrocony response
+  event_time      datetime
+}
+
+// Relacja N‑w‑w (gdy jedna operacja korzysta z kilku integracji lub odwrotnie)
+Table integration_mapping {
+  id              integer   [primary key]
+  integration_id  integer   [Ref:  > api_integration.id]
+  entity_type     varchar(30) // 'campaign', 'report_export', 'backup_schedule'
+  entity_id       integer
+  map_time        datetime
+}
 
 
-Ref: "user"."id" < "customer"."kraj_id"
-
-Ref: "campain"."id" < "campain"."start_date"
-
-Ref: "user_log_history"."id" < "user_log_history"."log_time"
-
-Ref: "report"."id" < "document"."nazwa_pliku"
+Ref: "integration_event"."message" < "integration_event"."user_id"
